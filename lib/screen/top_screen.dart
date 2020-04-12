@@ -1,9 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:coronatracker/provider/india_data_provider.dart';
+import 'package:coronatracker/provider/reverse_geocoding/reverse_geocoding.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
+import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:time_formatter/time_formatter.dart';
 
@@ -15,6 +17,13 @@ class TopScreen extends StatefulWidget {
 class _TopScreenState extends State<TopScreen> {
   bool _init = false;
   bool _is_load = false;
+  LocationData _locationData;
+
+  Future<LocationData> get_location() async {
+    final Location location = Location();
+    _locationData = await location.getLocation();
+    return _locationData;
+  }
 
   @override
   void didChangeDependencies() {
@@ -29,6 +38,10 @@ class _TopScreenState extends State<TopScreen> {
                 .a
                 .cases
                 .toString());
+        get_location().then((location) {
+          Provider.of<ReverseGeocoding>(context, listen: false)
+              .getAddress(location.longitude, location.latitude, "station");
+        });
         setState(() {
           _is_load = false;
           _init = true;
@@ -88,6 +101,7 @@ class _TopScreenState extends State<TopScreen> {
     final item = Provider.of<IndiaProvider>(context).a;
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
+    final location = Provider.of<ReverseGeocoding>(context).neighbourhood;
     return _is_load == false
         ? Card(
             elevation: 2,
@@ -107,6 +121,22 @@ class _TopScreenState extends State<TopScreen> {
                       style: TextStyle(
                           color: Colors.green, fontWeight: FontWeight.bold),
                     ),
+                  ),
+                ),
+                Container(
+                  width: width - 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(Icons.location_on),
+                      Center(
+                        child: AutoSizeText(
+                          location + "",
+                          style: TextStyle(
+                              color: Colors.blue, fontWeight: FontWeight.bold),
+                        ),
+                      )
+                    ],
                   ),
                 ),
                 Row(

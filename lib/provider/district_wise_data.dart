@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:coronatracker/model/case_time_series.dart';
 import 'package:coronatracker/model/data_model.dart';
 import 'package:coronatracker/model/districtwise_data.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,8 +8,13 @@ import 'package:http/http.dart' as http;
 
 class DistrictWiseData with ChangeNotifier {
   List<DataModel> _items = [];
+  List<CaseTimeSeries> _items_time_serier = [];
   List<DataModel> get item {
     return List.from(_items);
+  }
+
+  List<CaseTimeSeries> get items_time_serier {
+    return List.from(_items_time_serier);
   }
 
   int comp(DataModel a, DataModel b) {
@@ -51,12 +57,13 @@ class DistrictWiseData with ChangeNotifier {
     final String url = 'https://api.covid19india.org/data.json';
     try {
       final response = await http.get(url);
-      final extractedData_StateWise = json.decode(response.body)['statewise'];
+      final extractedData_StateWise = json.decode(response.body);
       if (extractedData_StateWise == null) {
         return;
       }
 
       final List<DataModel> loadedProducts = [];
+      final List<CaseTimeSeries> loadedProducts_ = [];
 
       final String url2 =
           'https://api.covid19india.org/state_district_wise.json';
@@ -67,7 +74,7 @@ class DistrictWiseData with ChangeNotifier {
         if (extractedData == null) {
           return;
         }
-        extractedData_StateWise.forEach((state_data) {
+        extractedData_StateWise['statewise'].forEach((state_data) {
           DataModel temp = DataModel(
             state: state_data['state'],
             active: state_data['active'],
@@ -99,11 +106,20 @@ class DistrictWiseData with ChangeNotifier {
           loadedProducts.add(temp);
         });
         _items.clear();
-
         _items = clean(loadedProducts);
-        print("len->" + _items.length.toString());
-
         _items.sort(comp);
+        extractedData_StateWise['cases_time_series'].forEach((state_data) {
+          loadedProducts_.add(CaseTimeSeries(
+            dailyconfirmed: state_data['dailyconfirmed'],
+            dailydeceased: state_data['dailydeceased'],
+            dailyrecovered: state_data['dailyrecovered'],
+            totalconfirmed: state_data['dailyconfirmed'],
+            totaldeceased: state_data['totaldeceased'],
+            totalrecovered: state_data['totalrecovered'],
+            date: state_data['date'],
+          ));
+        });
+        _items_time_serier = loadedProducts_;
         print("len" + _items.length.toString());
       } catch (e) {}
     } catch (e) {

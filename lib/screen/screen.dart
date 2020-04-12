@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
+import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
 class SingleData extends StatelessWidget {
@@ -120,7 +121,7 @@ class SingleData extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: <Widget>[
                             Icon(
-                              Icons.arrow_downward,
+                              Icons.arrow_upward,
                               color: Colors.green,
                               size: 15,
                             ),

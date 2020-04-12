@@ -1,7 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:coronatracker/provider/district_wise_data.dart';
 import 'package:coronatracker/screen/bottom_screen.dart';
-import 'package:coronatracker/screen/screen.dart';
+import 'package:coronatracker/screen/chart.dart';
 import 'package:coronatracker/search/search_toggle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +9,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 
 import 'provider/india_data_provider.dart';
+import 'provider/reverse_geocoding/reverse_geocoding.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -31,6 +32,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider.value(
           value: IndiaProvider(),
+        ),
+        ChangeNotifierProvider.value(
+          value: ReverseGeocoding(),
         ),
       ],
       child: MaterialApp(
@@ -145,6 +149,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 )
               ],
             ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (ctx) => Chart()));
+        },
+        backgroundColor: Colors.green,
+        child: Icon(Icons.map),
+      ),
       body: SingleChildScrollView(
         child: RefreshIndicator(
           onRefresh: _refresh,
