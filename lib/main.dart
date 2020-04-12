@@ -5,9 +5,15 @@ import 'package:coronatracker/screen/screen.dart';
 import 'package:coronatracker/search/search_toggle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 
 import 'provider/india_data_provider.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+// Streams are created so that app can respond to notification-related events since the plugin is initialised in the `main` function
 
 void main() => runApp(MyApp());
 
@@ -59,10 +65,13 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     Future<bool> _refresh() async {
-      Provider.of<IndiaProvider>(context, listen: false).fetch().then((_) {});
-      Provider.of<DistrictWiseData>(context, listen: false)
-          .fetch_data()
-          .then((_) {});
+      await Provider.of<IndiaProvider>(context, listen: false)
+          .fetch()
+          .then((_) {
+        Provider.of<DistrictWiseData>(context, listen: false)
+            .fetch_data()
+            .then((_) {});
+      });
     }
 
     return Scaffold(

@@ -120,7 +120,7 @@ class SingleData extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: <Widget>[
                             Icon(
-                              Icons.arrow_upward,
+                              Icons.arrow_downward,
                               color: Colors.green,
                               size: 15,
                             ),

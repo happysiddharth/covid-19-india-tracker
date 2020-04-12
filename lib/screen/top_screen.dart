@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:coronatracker/provider/india_data_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:time_formatter/time_formatter.dart';
@@ -23,6 +24,11 @@ class _TopScreenState extends State<TopScreen> {
         _is_load = true;
       });
       Provider.of<IndiaProvider>(context).fetch().then((_) {
+        _showNotificationWithDefaultSound(
+            Provider.of<IndiaProvider>(context, listen: false)
+                .a
+                .cases
+                .toString());
         setState(() {
           _is_load = false;
           _init = true;
@@ -30,6 +36,51 @@ class _TopScreenState extends State<TopScreen> {
       });
     }
     super.didChangeDependencies();
+  }
+
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  Future onSelectNotification(String payload) async {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return new AlertDialog(
+          title: Text("Total Case In India"),
+          content: Text("Case : $payload"),
+        );
+      },
+    );
+  }
+
+  Future _showNotificationWithDefaultSound(String cases) async {
+    var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+        'your channel id', 'your channel name', 'your channel description',
+        importance: Importance.Max, priority: Priority.High);
+    var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+    var platformChannelSpecifics = new NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      'Total Cases',
+      cases,
+      platformChannelSpecifics,
+      payload: cases,
+    );
+  }
+
+// Me
+  @override
+  initState() {
+    super.initState();
+    // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
+    // If you have skipped STEP 3 then change app_icon to @mipmap/ic_launcher
+    var initializationSettingsAndroid =
+        new AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettingsIOS = new IOSInitializationSettings();
+    var initializationSettings = new InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
   }
 
   @override

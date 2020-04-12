@@ -112,24 +112,35 @@ class _BottomMenuState extends State<BottomMenu> {
           _loading == false
               ? Consumer<DistrictWiseData>(
                   builder: (_, item, __) {
-                    return Container(
-                      height: height - (height / 4) - 136,
-                      width: double.infinity,
-                      child: ListView.builder(
-                        itemBuilder: (_, i) {
-                          return ChangeNotifierProvider.value(
-                            value: item.find_by_name(
-                                Provider.of<SearchToggle>(context)
-                                    .search_string)[i],
-                            child: SingleData(),
+                    return item
+                                .find_by_name(Provider.of<SearchToggle>(context)
+                                    .search_string)
+                                .length >
+                            0
+                        ? Container(
+                            height: height - (height / 4) - 136,
+                            width: double.infinity,
+                            child: ListView.builder(
+                              itemBuilder: (_, i) {
+                                return ChangeNotifierProvider.value(
+                                  value: item.find_by_name(
+                                      Provider.of<SearchToggle>(context)
+                                          .search_string)[i],
+                                  child: SingleData(),
+                                );
+                              },
+                              itemCount: item
+                                  .find_by_name(
+                                      Provider.of<SearchToggle>(context)
+                                          .search_string)
+                                  .length,
+                            ),
+                          )
+                        : Container(
+                            child: Center(
+                              child: Text("NO ITEM"),
+                            ),
                           );
-                        },
-                        itemCount: item
-                            .find_by_name(Provider.of<SearchToggle>(context)
-                                .search_string)
-                            .length,
-                      ),
-                    );
                   },
                 )
               : Container(
